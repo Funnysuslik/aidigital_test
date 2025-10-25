@@ -6,7 +6,6 @@ create folders for custom scripts for crawlers and parsers for differ data sourc
 create some conventions for data fileds and what could go to the DB
 """
 
-from calendar import c
 from typing import Any, Dict, List
 
 import pandas as pd
@@ -33,7 +32,7 @@ class Scraper:
 
                 df = Parser.parse_json_restcountries(raw_data)
                 
-
+                Loader.save_df_psql(self.source, df)
                 return df
 
             case "local_json":
@@ -102,8 +101,7 @@ class Loader:
     """
     @staticmethod
     def save_df_psql(source_name: str, data: pd.DataFrame):
-        data.to_sql(name=source_name, con = engine, if_exists='append')
-        
+         data.to_sql(name=source_name, con=engine, if_exists='append')      
 
 
 if __name__ == "__main__":

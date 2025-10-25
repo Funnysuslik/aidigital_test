@@ -12,6 +12,12 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
+    POSTGRES_SERVER: str
+    POSTGRES_PORT: int
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_DB: str
+
     @property
     def DATABASE_URI(self) -> PostgresDsn:
         return MultiHostUrl.build(
