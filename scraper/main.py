@@ -1,14 +1,19 @@
 """
 Service for gathering data from sources (restcountries rn) and saving it in DB
 BTW it's possible to simply use python lib "python-restcountries",  but it's not the goal of this test project
+As a future improvments it's possible to take out crawler, parser, loader to separte files,
+create folders for custom scripts for crawlers and parsers for differ data sources
+create some conventions for data fileds and what could go to the DB
 """
 
+from calendar import c
 from typing import Any, Dict, List
 
 import pandas as pd
 import requests
 
 from core.settings import settings
+from core.db import engine
 
 
 class Scraper:
@@ -20,14 +25,15 @@ class Scraper:
         self.source = source  # could be 'restcountries' only for now
         self.fields = fields or []
 
-    def scrape(self) -> List[Dict[str, Any]]:
+    def scrape(self) -> Any:
         match self.source:
             case "restcountries":
                 crawler = Crawler(self.fields)
                 raw_data = crawler.crawl()
 
-                df = Parser.parse_json(raw_data)
-                ...
+                df = Parser.parse_json_restcountries(raw_data)
+                
+
                 return df
 
             case "local_json":
@@ -59,23 +65,46 @@ class Parser:
     """
 
     @staticmethod
-    def parse_json(data: List[Dict[str, Any]]) -> pd.DataFrame:
+    def parse_json_restcountries(data: List[Dict[str, Any]]) -> pd.DataFrame:
         """
         Convert JSON to pandas DataFrame.
         Example fields: name, population, flags, region, etc.
         """
-        return pd.json_normalize(data)
+
+        # here is a possible place for calling validate function (need to add it in Parser class)
+        df = pd.json_normalize(data, sep='_')
+
+        patterns = [
+            r'name_nativeName_\w+_official',
+            r'name_nativeName_\w+_common',
+            r'currencies_\w+_name',
+            r'currencies_\w+_symbol',
+            r'languages_\w+',
+        ]
+
+        for column_regex in patterns:
+            common_columns = df.filter(regex=column_regex).columns
+            if len(common_columns) == 0:
+                continue
+
+            new_name = column_regex.replace(r'_\w+', '')
+            df[new_name] = df[common_columns].apply(
+                lambda row: ', '.join(row.dropna().astype(str)), axis=1
+            )
+            df.drop(columns=common_columns, inplace=True)
+
+        return df # pd.json_normalize(data, sep='_')
 
 
 class Loader:
     """
     Saving data to the psql. possible to update with other data storages
     """
-
-    ...
+    @staticmethod
+    def save_df_psql(source_name: str, data: pd.DataFrame):
+        data.to_sql(name=source_name, con = engine, if_exists='append')
+        
 
 
 if __name__ == "__main__":
-    scraper = Scraper("restcountries", settings.DEFAULT_FIELDS)
-    data = scraper.scrape()
-    print(data)
+    print(Scraper("restcountries", settings.DEFAULT_FIELDS).scrape()) # First step test
