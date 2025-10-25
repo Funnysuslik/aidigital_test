@@ -30,6 +30,7 @@ sh entrypoint.sh
 ### Database
 
 * Define mandatory fields and add indexes to improve query performance — at least for trusted and well-known data sources.
+* Issue with pandas creating connections with DB should be addressed to keep it stable.
 
 ### Application
 
