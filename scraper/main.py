@@ -29,9 +29,9 @@ class Scraper:
             case "restcountries":
                 df = pd.DataFrame()
                 # could be pick out to the script or yaml (what ever way/lib you choose) file for each data source
-                for attributes_batch in (self.fields[i:i+9] for i in range(0, len(self.fields), 9)):
+                for attributes_batch in (self.fields[i : i + 9] for i in range(0, len(self.fields), 9)):
                     attributes_batch.append("ccn3")
-                      
+
                     crawler = Crawler(attributes_batch)
                     raw_data = crawler.crawl()
                     batch_df = Parser.parse_json_restcountries(raw_data)
@@ -79,7 +79,7 @@ class Parser:
         # here is a possible place for calling validate function (need to add it in Parser class)
         df = pd.json_normalize(data, sep="_")
 
-        # duno if it's ok for you to have such custom solutions, but without these optiomisations there is > 700 columns, that is unusable 
+        # duno if it's ok for you to have such custom solutions, but without these optiomisations there is > 700 columns, that is unusable
         # as i mentioned before it's possble to rewrite class so it calls script for data source to optimize data
         patterns = [
             r"name_nativeName_\w+_official",
@@ -116,5 +116,5 @@ if __name__ == "__main__":
     # import all attirbutes i could find in the API sources
     # for attributes_batch in (settings.DEFAULT_FIELDS[i:i+9] for i in range(0, len(settings.DEFAULT_FIELDS), 9)):
     #     attributes_batch.append("cioc")
-        
+
     #     print(Scraper(settings.COUNTRIES_SOURCE_NAME, attributes_batch).scrape())
