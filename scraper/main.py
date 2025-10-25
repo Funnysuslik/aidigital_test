@@ -27,6 +27,7 @@ class Scraper:
     def scrape(self) -> Any:
         match self.source:
             case "restcountries":
+                # could be pick out to the script or yaml (what ever way/lib you choose) file for each data source
                 crawler = Crawler(self.fields)
                 raw_data = crawler.crawl()
 
@@ -67,12 +68,13 @@ class Parser:
     def parse_json_restcountries(data: List[Dict[str, Any]]) -> pd.DataFrame:
         """
         Convert JSON to pandas DataFrame.
-        Example fields: name, population, flags, region, etc.
         """
 
         # here is a possible place for calling validate function (need to add it in Parser class)
         df = pd.json_normalize(data, sep="_")
 
+        # duno if it's ok for you to have such custom solutions, but without these optiomisations there is > 700 columns, that is unusable 
+        # as i mentioned before it's possble to rewrite class so it calls script for data source to optimize data
         patterns = [
             r"name_nativeName_\w+_official",
             r"name_nativeName_\w+_common",
