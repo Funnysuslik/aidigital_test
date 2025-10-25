@@ -39,7 +39,7 @@ class Scraper:
 class Crawler:
     """
     Fetching data
-    a.t.m. it's nerrowed to gaver datafrom https://restcountries.com/v3.1/all.
+    a.t.m. it's nerrowed to gather data from https://restcountries.com/v3.1/all.
     """
 
     def __init__(self, fields: List[str] = None):
@@ -55,7 +55,7 @@ class Crawler:
 class Parser:
     """
     Transform data (json from the request a.t.m.) to the pandas DataFrame format.
-    Some validations(?)
+    Some data validations and parsing other data sources in the future(?) 
     """
 
     @staticmethod
