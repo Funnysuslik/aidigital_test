@@ -1,9 +1,9 @@
-### PLAN 
+### PLAN
 1. Need to write class for API request from https://restcountries.com/v3.1/all endpoint (!You **must** specify the fields you need (up to 10 fields) when calling the `all` endpoints, otherwise you’ll get a `bad request` response. )*
 
 you must choose most important fields and add them to the default endpoint constant. Optionally add variable for fields with starting script (?) don’t see implementation rn, need think about it.**
 
-1.2 add model to verify response in case of incidents or API changes with pydentic (use sqlmodel) 
+1.2 add model to verify response in case of incidents or API changes with pydentic (use sqlmodel)
 but in the task explicitly said that result should be dataframe instance of pandas lib***
 
 2 write data to the PostgreSQL via ORM (?)(find which)
@@ -12,7 +12,7 @@ but in the task explicitly said that result should be dataframe instance of pand
 
 2.2 think if i need alembic SQLmodel e.t.c.
 
-3 write simple plotly app 
+3 write simple plotly app
 
 3.1 Create a visualization - it should include a table with data and block with flags.
 

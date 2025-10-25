@@ -1,7 +1,8 @@
 from collections.abc import Generator
 
-from core.settings import settings
 from sqlmodel import Session, create_engine
+
+from core.settings import settings
 
 engine = create_engine(str(settings.DATABASE_URI))
 
