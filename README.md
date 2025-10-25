@@ -69,14 +69,14 @@ sh entrypoint.sh
   * Add `docker-compose` with at least:
 
     * PostgreSQL
-    * Plotly (for visualization, in advance)
-* Decide whether to include Alembic for migrations.
+    * Dash (for visualization, in advance)
+* Decide whether to include Alembic for migrations to keep tables versions control for DB.
 
 ---
 
-### 3. Plotly Visualization
+### 3. Dash Visualization
 
-* Build a simple Plotly app:
+* Build a simple Dash app:
 
   * Display a table with the saved country data.
   * Add a flag block showing the currently selected country.
@@ -90,7 +90,7 @@ sh entrypoint.sh
 ### 4. Configuration
 
 * Use a `.env` file for configuration constants.
-* Add automatic `.env` generation from Google Secret Manager (confirm the exact service name).
+* Add automatic `.env` generation from Google Secret Manager (confirm the exact service name) if needed.
 
 ---
 
@@ -108,7 +108,7 @@ sh entrypoint.sh
 
 ### 7. Data Sources
 
-Plotly should be able to visualize data from three sources:
+Dash should be able to visualize data from three sources:
 
 1. Redis
 2. Database
