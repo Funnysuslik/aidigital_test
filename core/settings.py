@@ -31,6 +31,9 @@ class Settings(BaseSettings):
 
     BASE_API_URL: str
     DEFAULT_FIELDS: List
+    COUNTRIES_SOURCE_NAME: str
+
+    DEFAULT_COLUMNS: str
 
 
 settings = Settings()

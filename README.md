@@ -35,65 +35,35 @@ but in the task explicitly said that result should be dataframe instance of pand
 * You can specify which fields to retrieve. The fields parameter will give autocomplete suggestions. Full list of available fields:
 
 `name`: Object with common, official, and native names
-
 `tld`: Top-level domain
-
 `cca2`, `ccn3`, `cca3`, `cioc`: Country codes
-
 `independent`: Boolean flag
-
 `status`: Status of the country
-
 `unMember`: UN membership status
-
 `currencies`: Currency information
-
 `idd`: International dialing info
-
 `capital`: Capital city
-
 `altSpellings`: Alternative spellings
-
 `region`, `subregion`: Region info
-
 `languages`: Languages spoken
-
 `translations`: Translations of country name
-
 `latlng`: Latitude and longitude
-
 `landlocked`: Boolean flag
-
 `borders`: Bordering countries
-
 `area`: Area in square kilometers
-
 `demonyms`: Demonyms
-
 `flag`: Emoji flag
-
 `maps`: Google and OpenStreetMap links
-
 `population`: Population count
-
 `gini`: GINI coefficient
-
 `fifa`: FIFA code
-
 `car`: Car signs and driving side
-
 `timezones`: List of timezones
-
 `continents`: List of continents
-
 `flags`: Object with PNG and SVG flag URLs
-
 `coatOfArms`: Coat of arms images
-
 `startOfWeek`: Start of the week
-
 `capitalInfo`: Capital coordinates
-
 `postalCode`: Postal code format
 
 **  1. The code should be production-ready, so use your best practices. If there is something you want to point out, or something that you paid special attention to when working with this API, feel free to write comments in the code, they will be appreciated.

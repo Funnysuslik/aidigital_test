@@ -27,11 +27,17 @@ class Scraper:
     def scrape(self) -> Any:
         match self.source:
             case "restcountries":
+                df = pd.DataFrame()
                 # could be pick out to the script or yaml (what ever way/lib you choose) file for each data source
-                crawler = Crawler(self.fields)
-                raw_data = crawler.crawl()
+                for attributes_batch in (self.fields[i:i+9] for i in range(0, len(self.fields), 9)):
+                    attributes_batch.append("ccn3")
+                      
+                    crawler = Crawler(attributes_batch)
+                    raw_data = crawler.crawl()
+                    batch_df = Parser.parse_json_restcountries(raw_data)
 
-                df = Parser.parse_json_restcountries(raw_data)
+                    df = batch_df if df.empty else pd.merge(left=df, right=batch_df, on="ccn3", how="outer")
+                    print(df)
 
                 Loader.save_df_psql(self.source, df)
                 return df
@@ -106,4 +112,9 @@ class Loader:
 
 
 if __name__ == "__main__":
-    print(Scraper("restcountries", settings.DEFAULT_FIELDS).scrape())  # First step test
+    print(Scraper(settings.COUNTRIES_SOURCE_NAME, settings.DEFAULT_FIELDS).scrape())  # First step test
+    # import all attirbutes i could find in the API sources
+    # for attributes_batch in (settings.DEFAULT_FIELDS[i:i+9] for i in range(0, len(settings.DEFAULT_FIELDS), 9)):
+    #     attributes_batch.append("cioc")
+        
+    #     print(Scraper(settings.COUNTRIES_SOURCE_NAME, attributes_batch).scrape())
