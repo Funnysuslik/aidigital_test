@@ -11,8 +11,8 @@ from typing import Any, Dict, List
 import pandas as pd
 import requests
 
-from core.settings import settings
 from core.db import engine
+from core.settings import settings
 
 
 class Scraper:
@@ -31,7 +31,7 @@ class Scraper:
                 raw_data = crawler.crawl()
 
                 df = Parser.parse_json_restcountries(raw_data)
-                
+
                 Loader.save_df_psql(self.source, df)
                 return df
 
@@ -60,7 +60,7 @@ class Crawler:
 class Parser:
     """
     Transform data (json from the request a.t.m.) to the pandas DataFrame format.
-    Some data validations and parsing other data sources in the future(?) 
+    Some data validations and parsing other data sources in the future(?)
     """
 
     @staticmethod
@@ -71,14 +71,14 @@ class Parser:
         """
 
         # here is a possible place for calling validate function (need to add it in Parser class)
-        df = pd.json_normalize(data, sep='_')
+        df = pd.json_normalize(data, sep="_")
 
         patterns = [
-            r'name_nativeName_\w+_official',
-            r'name_nativeName_\w+_common',
-            r'currencies_\w+_name',
-            r'currencies_\w+_symbol',
-            r'languages_\w+',
+            r"name_nativeName_\w+_official",
+            r"name_nativeName_\w+_common",
+            r"currencies_\w+_name",
+            r"currencies_\w+_symbol",
+            r"languages_\w+",
         ]
 
         for column_regex in patterns:
@@ -86,23 +86,22 @@ class Parser:
             if len(common_columns) == 0:
                 continue
 
-            new_name = column_regex.replace(r'_\w+', '')
-            df[new_name] = df[common_columns].apply(
-                lambda row: ', '.join(row.dropna().astype(str)), axis=1
-            )
+            new_name = column_regex.replace(r"_\w+", "")
+            df[new_name] = df[common_columns].apply(lambda row: ", ".join(row.dropna().astype(str)), axis=1)
             df.drop(columns=common_columns, inplace=True)
 
-        return df # pd.json_normalize(data, sep='_')
+        return df  # pd.json_normalize(data, sep='_')
 
 
 class Loader:
     """
     Saving data to the psql. possible to update with other data storages
     """
+
     @staticmethod
     def save_df_psql(source_name: str, data: pd.DataFrame):
-         data.to_sql(name=source_name, con=engine, if_exists='append')      
+        data.to_sql(name=source_name, con=engine, if_exists="append")
 
 
 if __name__ == "__main__":
-    print(Scraper("restcountries", settings.DEFAULT_FIELDS).scrape()) # First step test
+    print(Scraper("restcountries", settings.DEFAULT_FIELDS).scrape())  # First step test
