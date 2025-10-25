@@ -1,88 +1,134 @@
-### How to run
-simply run bash script 'sh entrypoint.sh'
-### Further ideas
-Implement tests for app and scraper
-## Scraper
-A.t.m. to fill db with data you should run scraper.main once. It's kinda hardcoded for restcountries.
-It's possible to implement scripts calling for each step if needed, store scripts in dedicated dirs
-Add data validations, at least for well known sources
-## DB
-Decide mandatory fields, index them for better access
-## App
-Move to the more flexable framework
-Add cacheing (redis service is easy to set up and add decorators for every case of cacheing)
-Implement logic to gather data in order Redis -> DB -> Scraper
-Implement of gathering feilds in case of need, don't collect all and keep them in DB once on start of the service (for this case it's ok, but what if there is thousands of them?)
-  for example queue Scraper task via kafka/RabitMQ
+# RestCountries Data Service (Test task for AI digital)
 
-### PLAN
-1. Need to write class for API request from https://restcountries.com/v3.1/all endpoint (!You **must** specify the fields you need (up to 10 fields) when calling the `all` endpoints, otherwise you’ll get a `bad request` response. )*
+A small project demonstrating data collection, storage, and visualization based on the [RestCountries API](https://restcountries.com/).
+The goal is to build a simple, production-style pipeline using Python, Pandas, PostgreSQL, Dash.
 
-you must choose most important fields and add them to the default endpoint constant. Optionally add variable for fields with starting script (?) don’t see implementation rn, need think about it.**
+---
 
-1.2 add model to verify response in case of incidents or API changes with pydentic (use sqlmodel)
-but in the task explicitly said that result should be dataframe instance of pandas lib***
+## How to Run
 
-2 write data to the PostgreSQL via ORM (?)(find which)
+```bash
+sh entrypoint.sh
+```
 
-2.1 add infra - docker-compose with at least psql and plotly in advance.
+---
 
-2.2 think if i need alembic SQLmodel e.t.c.
+## Further Ideas
 
-3 write simple plotly app
+### Testing
 
-3.1 Create a visualization - it should include a table with data and block with flags.
+* Implement tests for both the application and the scraper components.
 
-3.2 Table should support sorting and include all data you have saved to database.
+### Scraper
 
-3.3 Block with flags should display flag of the country selected in the table right now (flag urls are available from the API).
+* To populate the database, currently you must run `scraper.main()` manually.
+  At the moment it's hardcoded for RestCountries.
+* In the future, consider adding scripts for each processing step and storing them in dedicated directories.
+  And run scraper in case of need for certain source
+* Add data validations — at least for trusted and well-known data sources.
 
-4 add settings to collect constants from .env
+### Database
 
-5 add .env generation with google secrets service (how it called?)
+* Define mandatory fields and add indexes to improve query performance — at least for trusted and well-known data sources.
 
-6 add logger to log success requests and fails
+### Application
 
-8 add redis server to store recently collected requested fields?
+* Migrate to a more flexible and powerfull framework.
 
-9 in plotly should present 3 sources for data to build data visualization (table): 1 - Redis 2 - DB 3 - data collection script from step 1
+* Add caching (Redis service is easy to set up; decorators can be used for cache logic to keep code DRY).
 
-10 basic rabitmq tasks for different sources of data.
+* Implement a data fetching strategy:
 
-* You can specify which fields to retrieve. The fields parameter will give autocomplete suggestions. Full list of available fields:
+  ```
+  Redis → DB → Scraper
+  ```
 
-`name`: Object with common, official, and native names
-`tld`: Top-level domain
-`cca2`, `ccn3`, `cca3`, `cioc`: Country codes
-`independent`: Boolean flag
-`status`: Status of the country
-`unMember`: UN membership status
-`currencies`: Currency information
-`idd`: International dialing info
-`capital`: Capital city
-`altSpellings`: Alternative spellings
-`region`, `subregion`: Region info
-`languages`: Languages spoken
-`translations`: Translations of country name
-`latlng`: Latitude and longitude
-`landlocked`: Boolean flag
-`borders`: Bordering countries
-`area`: Area in square kilometers
-`demonyms`: Demonyms
-`flag`: Emoji flag
-`maps`: Google and OpenStreetMap links
-`population`: Population count
-`gini`: GINI coefficient
-`fifa`: FIFA code
-`car`: Car signs and driving side
-`timezones`: List of timezones
-`continents`: List of continents
-`flags`: Object with PNG and SVG flag URLs
-`coatOfArms`: Coat of arms images
-`startOfWeek`: Start of the week
-`capitalInfo`: Capital coordinates
-`postalCode`: Postal code format
+* Implement on-demand field collection instead of loading everything at startup.
+  For large datasets, consider queueing scraper tasks via Kafka or RabbitMQ.
 
-**  1. The code should be production-ready, so use your best practices. If there is something you want to point out, or something that you paid special attention to when working with this API, feel free to write comments in the code, they will be appreciated.
+---
 
-*** As a result of this step you should have a code to receive data into pandas dataframe.
+## Project Plan
+
+### 1. API Client
+
+* Write a class for requests to the `https://restcountries.com/v3.1/all` endpoint.
+  **Note:** You must specify the required fields (up to 10) when calling the `all` endpoint — otherwise, it returns a Bad Request.
+* Choose the most important fields and store them in a default constant.
+* Optionally, add a variable to specify fields dynamically when starting the script.
+* (?) Validate the response using Pydantic (or SQLModel) to detect API changes or errors.
+  However, the final result must be a `pandas.DataFrame` instance.
+
+---
+
+### 2. Database
+
+* Write collected data to PostgreSQL via an ORM (decide which to use — e.g., SQLModel or SQLAlchemy).
+* Infrastructure:
+
+  * Add `docker-compose` with at least:
+
+    * PostgreSQL
+    * Plotly (for visualization, in advance)
+* Decide whether to include Alembic for migrations.
+
+---
+
+### 3. Plotly Visualization
+
+* Build a simple Plotly app:
+
+  * Display a table with the saved country data.
+  * Add a flag block showing the currently selected country.
+* Requirements:
+
+  * The table must support sorting and display all saved fields.
+  * The flag should update dynamically based on the selected table row.
+
+---
+
+### 4. Configuration
+
+* Use a `.env` file for configuration constants.
+* Add automatic `.env` generation from Google Secret Manager (confirm the exact service name).
+
+---
+
+### 5. Logging
+
+* Add a logger to record successful and failed API requests.
+
+---
+
+### 6. Caching
+
+* Add a Redis service to store recently collected or requested fields.
+
+---
+
+### 7. Data Sources
+
+Plotly should be able to visualize data from three sources:
+
+1. Redis
+2. Database
+3. Scraper (real-time API request)
+
+---
+
+### 8. Message Queue
+
+* Implement basic RabbitMQ tasks for different data sources.
+
+---
+
+## Available API Fields
+
+You can specify which fields to retrieve (up to 10).
+Full list of available fields:
+
+`name`, `tld`, `cca2`, `ccn3`, `cca3`, `cioc`, `independent`, `status`, `unMember`,
+`currencies`, `idd`, `capital`, `altSpellings`, `region`, `subregion`,
+`languages`, `translations`, `latlng`, `landlocked`, `borders`, `area`,
+`demonyms`, `flag`, `maps`, `population`, `gini`, `fifa`, `car`, `timezones`,
+`continents`, `flags`, `coatOfArms`, `startOfWeek`, `capitalInfo`, `postalCode`
