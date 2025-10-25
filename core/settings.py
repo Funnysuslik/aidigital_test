@@ -33,7 +33,8 @@ class Settings(BaseSettings):
     DEFAULT_FIELDS: List
     COUNTRIES_SOURCE_NAME: str
 
-    DEFAULT_COLUMNS: str
+    DEFAULT_COLUMNS: List[str]
+    DEBUG_MODE: bool
 
 
 settings = Settings()

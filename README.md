@@ -1,3 +1,20 @@
+### How to run
+simply run bash script 'sh entrypoint.sh'
+### Further ideas
+Implement tests for app and scraper
+## Scraper
+A.t.m. to fill db with data you should run scraper.main once. It's kinda hardcoded for restcountries.
+It's possible to implement scripts calling for each step if needed, store scripts in dedicated dirs
+Add data validations, at least for well known sources
+## DB
+Decide mandatory fields, index them for better access
+## App
+Move to the more flexable framework
+Add cacheing (redis service is easy to set up and add decorators for every case of cacheing)
+Implement logic to gather data in order Redis -> DB -> Scraper
+Implement of gathering feilds in case of need, don't collect all and keep them in DB once on start of the service (for this case it's ok, but what if there is thousands of them?)
+  for example queue Scraper task via kafka/RabitMQ
+
 ### PLAN
 1. Need to write class for API request from https://restcountries.com/v3.1/all endpoint (!You **must** specify the fields you need (up to 10 fields) when calling the `all` endpoints, otherwise you’ll get a `bad request` response. )*
 

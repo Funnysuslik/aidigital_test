@@ -14,5 +14,31 @@ services:
       timeout: 5s
       retries: 5
 
+  scraper:
+    build:
+      context: ..
+      dockerfile: scraper/scraper.dockerfile
+    env_file:
+      - ../.env
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  app:
+    build:
+      context: ..
+      dockerfile: app/dash.dockerfile
+    restart: always
+    env_file:
+      - ../.env
+    ports:
+      - '8000:8000'
+    depends_on:
+      scraper:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+
 volumes:
   postgres_data:
