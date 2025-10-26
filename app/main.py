@@ -42,6 +42,7 @@ app.layout = html.Div(
                             id="data-table",
                             data=df.to_dict("records"),
                             columns=[{"name": col.replace("_", " ").title(), "id": col} for col in main_columns],
+                            fixed_rows={'headers': True},
                             style_cell={"textAlign": "left", "padding": "10px"},
                             style_header={"backgroundColor": "rgb(230, 230, 230)", "fontWeight": "bold"},
                             style_data={"whiteSpace": "normal", "height": "auto"},
