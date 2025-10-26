@@ -26,9 +26,9 @@ class Scraper:
 
     def scrape(self) -> Any:
         match self.source:
+            # could be pick out to the script or yaml (what ever way/lib you choose) file for each data source
             case "restcountries":
                 df = pd.DataFrame()
-                # could be pick out to the script or yaml (what ever way/lib you choose) file for each data source
                 for attributes_batch in (self.fields[i : i + 9] for i in range(0, len(self.fields), 9)):
                     attributes_batch.append("ccn3")
 
@@ -37,7 +37,6 @@ class Scraper:
                     batch_df = Parser.parse_json_restcountries(raw_data)
 
                     df = batch_df if df.empty else pd.merge(left=df, right=batch_df, on="ccn3", how="outer")
-                    print(df)
 
                 Loader.save_df_psql(self.source, df)
                 return df
@@ -52,6 +51,9 @@ class Crawler:
     """
     Fetching data
     a.t.m. it's nerrowed to gather data from https://restcountries.com/v3.1/all.
+    This solution don't need any sessions and e.t.c.
+    But in case it will be needed issue with number of open connections should be adddressed
+    In advanced features for data sources that don't have a stable API, it is useful to add a retry mechanism.
     """
 
     def __init__(self, fields: List[str] = None):
@@ -73,7 +75,7 @@ class Parser:
     @staticmethod
     def parse_json_restcountries(data: List[Dict[str, Any]]) -> pd.DataFrame:
         """
-        Convert JSON to pandas DataFrame.
+        Convert JSON from restcountries API to pandas DataFrame.
         """
 
         # here is a possible place for calling validate function (need to add it in Parser class)
@@ -98,12 +100,13 @@ class Parser:
             df[new_name] = df[common_columns].apply(lambda row: ", ".join(row.dropna().astype(str)), axis=1)
             df.drop(columns=common_columns, inplace=True)
 
-        return df  # pd.json_normalize(data, sep='_')
+        return df
 
 
 class Loader:
     """
     Saving data to the psql. possible to update with other data storages
+    Have to think about proper connection to the database to not to overload DB
     """
 
     @staticmethod
@@ -112,9 +115,4 @@ class Loader:
 
 
 if __name__ == "__main__":
-    print(Scraper(settings.COUNTRIES_SOURCE_NAME, settings.DEFAULT_FIELDS).scrape())  # First step test
-    # import all attirbutes i could find in the API sources
-    # for attributes_batch in (settings.DEFAULT_FIELDS[i:i+9] for i in range(0, len(settings.DEFAULT_FIELDS), 9)):
-    #     attributes_batch.append("cioc")
-
-    #     print(Scraper(settings.COUNTRIES_SOURCE_NAME, attributes_batch).scrape())
+    print(Scraper(settings.COUNTRIES_SOURCE_NAME, settings.DEFAULT_FIELDS).scrape())
