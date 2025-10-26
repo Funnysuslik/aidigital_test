@@ -107,11 +107,12 @@ class Loader:
     """
     Saving data to the psql. possible to update with other data storages
     Have to think about proper connection to the database to not to overload DB
+    For sure there is will be an issue with data duplication, now it secured with if_exists="replace"
     """
 
     @staticmethod
     def save_df_psql(source_name: str, data: pd.DataFrame):
-        data.to_sql(name=source_name, con=engine, if_exists="append")
+        data.to_sql(name=source_name, con=engine, if_exists="replace")
 
 
 if __name__ == "__main__":
